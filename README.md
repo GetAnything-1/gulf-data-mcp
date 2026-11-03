@@ -1,5 +1,7 @@
 # Gulf Data MCP
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/getanything-1/gulf-data-mcp)](https://m8ven.ai/mcp/getanything-1/gulf-data-mcp?s=readme)
+
 An MCP server that gives Claude, ChatGPT, Cursor and other AI agents **live Gulf & Middle East data** plus **web search and web-to-Markdown** for grounding answers.
 
 | Tool | What it returns |
