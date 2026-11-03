@@ -12,9 +12,14 @@ from typing import Any, Literal
 import httpx
 from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.types import ToolAnnotations
 
 APIFY = "https://api.apify.com/v2/acts/get_anything~{actor}/run-sync-get-dataset-items"
 TIMEOUT = 300  # run-sync waits up to 5 minutes for the run to finish
+
+# Every tool only reads public web data: nothing is created, changed or deleted.
+READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False,
+                            idempotent_hint=True, open_world_hint=True)
 
 server = MCPServer(
     name="gulf-data",
@@ -44,7 +49,7 @@ def run_actor(actor: str, run_input: dict[str, Any], limit: int | None = None) -
     return resp.json()
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def dubai_property_transactions(
     from_date: str,
     to_date: str,
@@ -58,7 +63,7 @@ def dubai_property_transactions(
                      {"transactionType": transaction_type, "fromDate": from_date, "toDate": to_date})
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def gulf_jobs(
     keywords: list[str],
     country: Literal["uae", "saudi-arabia", "qatar", "kuwait", "bahrain", "oman"] = "uae",
@@ -71,7 +76,7 @@ def gulf_jobs(
                      {"keywords": keywords, "country": country, "maxJobsPerSource": max_jobs_per_source})
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def gold_price(
     currencies: list[str] = ["AED", "INR", "SAR", "USD"],
     include_history: bool = False,
@@ -86,7 +91,7 @@ def gold_price(
     })
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def amazon_best_sellers(
     marketplace: str = "ae",
     categories: list[str] = ["electronics"],
@@ -103,7 +108,7 @@ def amazon_best_sellers(
     })
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def noon_products(
     query: str,
     country: Literal["uae", "saudi", "egypt"] = "uae",
@@ -116,7 +121,7 @@ def noon_products(
     }, limit=max_products)
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def web_search(query: str, max_results: int = 5, fetch_page_content: bool = True,
                max_chars_per_page: int = 3000) -> list[dict[str, Any]]:
     """Search the web (DuckDuckGo) and return ranked results with title, URL, snippet and date,
@@ -128,7 +133,7 @@ def web_search(query: str, max_results: int = 5, fetch_page_content: bool = True
     })
 
 
-@server.tool()
+@server.tool(annotations=READ_ONLY)
 def web_to_markdown(urls: list[str], max_chars_per_page: int = 0, crawl_site: bool = False,
                     max_pages: int = 10) -> list[dict[str, Any]]:
     """Convert web pages to clean, LLM-ready Markdown (navigation, ads and cookie banners removed)
